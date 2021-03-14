@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "164158617753",
+    "project_id": "spook-589d7",
+    "storage_bucket": "spook-589d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164158617753:android:3d4a0430a231e98e2da008",
+        "android_client_info": {
+          "package_name": "com.spook.spook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164158617753-42t8jh2brpr2jj8mqrbci00klm85msfv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn--g5G2n_x42ntyBOJkwnjd_Utn8tsVg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164158617753-42t8jh2brpr2jj8mqrbci00klm85msfv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
