@@ -19,9 +19,21 @@ class _ListBuildState extends State<ListBuild> {
         child: ListView.builder(
           itemCount: widget.list.length,
           itemBuilder: (context, index) {
-            return RaisedButton(
-              child: Text(widget.list[index]),
-              onPressed: () {},
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0,),
+              child: RaisedButton(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5.0,),
+                  child: Column(
+                    children: <Widget>[
+                      Text('Name: ' + widget.list[index]['subject']),
+                      SizedBox(height: 5.0,),
+                      Text('Code: ' + widget.list[index]['key'])
+                    ],
+                  ),
+                ),
+                onPressed: () {},
+              ),
             );
           },
         ),

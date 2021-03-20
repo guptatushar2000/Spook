@@ -11,7 +11,7 @@ class _RegisterState extends State<Register> {
 
   final _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
-  AppUser user = AppUser();
+  AppUser user = AppUser(encode: [0, 0, 0, 0]);
   String _password = '';
   String error = '';
 
@@ -104,13 +104,11 @@ class _RegisterState extends State<Register> {
                     child: Text('Register'),
                     onPressed: () async {
                       if(_formKey.currentState.validate()) {
-                        dynamic result = await _auth.registerWithEmailAndPassword(user.email, _password);
+                        dynamic result = await _auth.registerWithEmailAndPassword(user, _password);
                         if(result == null) {
                           setState(() {
                             error = 'Please provide valid credentials';
                           });
-                        } else {
-                          // add data about the subs and classes on the database.
                         }
                       }
                     },

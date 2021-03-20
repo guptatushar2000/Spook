@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:spook/pages/settings.dart';
+import 'package:provider/provider.dart';
+import 'package:spook/models/user.dart';
+import 'package:spook/pages/settings.dart' as Set;
 import 'package:spook/services/optionsBuilder.dart';
 
 class Menu extends StatefulWidget {
@@ -14,15 +17,22 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
 
-  List teachList = ['english', 'hindi', 'maths'];
-  List studentList = ['english', 'hindi', 'maths'];
+  List teachList;
+  List studentList;
 
   @override
   Widget build(BuildContext context) {
+
+    final user = Provider.of<DocumentSnapshot>(context);
+
+    teachList = user != null? user.data()['teacher']: [];
+    studentList = user != null? user.data()['student']: [];
+
     if(widget.index == 0)
       return ListBuild(list: teachList);
     if(widget.index == 1)
       return ListBuild(list: studentList,);
-    return Settings();
+    else
+      return Set.Settings(user: AppUser(name: user.data()['name'], email: user.data()['email'], roll: user.data()['roll']));
   }
 }

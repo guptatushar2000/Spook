@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spook/models/user.dart';
+import 'package:spook/services/database.dart';
 
 class AuthService {
 
@@ -29,10 +30,14 @@ class AuthService {
   }
 
   // register with email and password.
-  Future registerWithEmailAndPassword(String email, String password) async {
+  Future registerWithEmailAndPassword(AppUser curUser, String password) async {
     try{
-      UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential result = await _auth.createUserWithEmailAndPassword(email: curUser.email, password: password);
       User user = result.user;
+
+      // create a new document for the user in the database.
+      await DatabaseService(uid: user.uid).updateUserData(curUser, [], []);
+
       return _userFromFirebaseUser(user);
     } catch(e) {
       print(e.toString());
