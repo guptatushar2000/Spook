@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:spook/models/user.dart';
 import 'package:spook/services/auth.dart';
+import 'package:spook/services/cameraSupport.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class _RegisterState extends State<Register> {
   AppUser user = AppUser(encode: [0, 0, 0, 0]);
   String _password = '';
   String error = '';
+  bool imageReceived = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +34,7 @@ class _RegisterState extends State<Register> {
               child: Column(
                 children: <Widget>[
                   SizedBox(height: 20.0,),
+                  // Input name of the user.
                   TextFormField(
                     validator: (val) {
                       return val.isEmpty? 'Provide a valid name': null;
@@ -45,6 +49,7 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                   SizedBox(height: 20.0,),
+                  // Input roll number of the user.
                   TextFormField(
                     validator: (val) {
                       return val.isEmpty? 'Provide a valid roll number': null;
@@ -59,6 +64,7 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                   SizedBox(height: 20.0,),
+                  // Input email id of the user.
                   TextFormField(
                     validator: (val) {
                       return (val.isEmpty || (!val.contains('@')))? 'Enter a valid email': null;
@@ -73,6 +79,7 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                   SizedBox(height: 20.0,),
+                  // Input password of the user.
                   TextFormField(
                     validator: (val) {
                       return (val.isEmpty || val.length < 6)? 'Enter a valid password': null;
@@ -88,21 +95,21 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                   SizedBox(height: 20.0,),
-                  // DropdownButton<String>(
-                  //   items: <String>['Teacher', 'Student']
-                  //                   .map<DropdownMenuItem<String>>((String val) {
-                  //                     return DropdownMenuItem<String>(
-                  //                       value: val,
-                  //                       child: Text(val),
-                  //                     );
-                  //   }).toList(),
-                  //   onChanged: (value) {},
-                  //   hint: Text('Select profession'),
-                  // ),
-                  SizedBox(height: 20.0,),
-                  RaisedButton(
-                    child: Text('Register'),
+                  // Input image of the user.
+                  ElevatedButton(
+                    child: !imageReceived? Text('Provide user Image'): Icon(Icons.thumb_up_alt_sharp),
                     onPressed: () async {
+                      bool gotImage = await CameraSupport(context: context).getImageClickedFromCamera();
+                      gotImage != null? setState(() {
+                        imageReceived = true;
+                      }): print('no image was found');
+                    },
+                  ),
+                  SizedBox(height: 40.0,),
+                  // Register the user on click.
+                  ElevatedButton(
+                    child: Text('Register'),
+                    onPressed: !imageReceived? null: () async {
                       if(_formKey.currentState.validate()) {
                         dynamic result = await _auth.registerWithEmailAndPassword(user, _password);
                         if(result == null) {
@@ -114,6 +121,7 @@ class _RegisterState extends State<Register> {
                     },
                   ),
                   SizedBox(height: 20.0,),
+                  // Display error message.
                   Text(
                     error,
                     style: TextStyle(

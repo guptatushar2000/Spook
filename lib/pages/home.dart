@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 actions: <Widget>[
-                  FlatButton(onPressed: () async {
+                  TextButton(onPressed: () async {
                     String code = getClassCode(6);
                     if(_selectedIndex == 0) {
                       await DatabaseService(uid: user.uid).updateSubjectData(code, subject, user.uid, false);
@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
                     }
                     Navigator.pop(context);
                   }, child: Text('Submit')),
-                  FlatButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
                 ],
               ),
               barrierDismissible: true,

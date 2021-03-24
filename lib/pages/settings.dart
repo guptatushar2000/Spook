@@ -31,7 +31,7 @@ class _SettingsState extends State<Settings> {
               SizedBox(height: 10.0,),
               Text('Roll: ' + widget.user.roll),
               SizedBox(height: 10.0,),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Log out'),
                 onPressed: () async {
                   await _auth.signOut();

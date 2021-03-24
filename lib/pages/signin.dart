@@ -58,7 +58,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 SizedBox(height: 20.0,),
-                RaisedButton(
+                ElevatedButton(
                   child: Text('Sign-in anon'),
                   onPressed: () async {
                     dynamic result = await _auth.signInAnon();
@@ -71,7 +71,7 @@ class _SignInState extends State<SignIn> {
                   },
                 ),
                 SizedBox(height: 20.0,),
-                RaisedButton(
+                ElevatedButton(
                   child: Text('Enter the app'),
                   onPressed: () async {
                     if(_formKey.currentState.validate()) {
@@ -87,7 +87,7 @@ class _SignInState extends State<SignIn> {
                   },
                 ),
                 SizedBox(height: 20.0,),
-                RaisedButton(
+                ElevatedButton(
                   child: Text('Register new user'),
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Register())),
                 ),

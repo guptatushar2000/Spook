@@ -29,9 +29,9 @@ class _MenuState extends State<Menu> {
     studentList = user != null? user.data()['student']: [];
 
     if(widget.index == 0)
-      return ListBuild(list: teachList);
+      return ListBuild(list: teachList, index: widget.index,);
     if(widget.index == 1)
-      return ListBuild(list: studentList,);
+      return ListBuild(list: studentList, index: widget.index,);
     else
       return Set.Settings(user: AppUser(name: user.data()['name'], email: user.data()['email'], roll: user.data()['roll']));
   }
