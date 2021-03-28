@@ -99,9 +99,10 @@ class _RegisterState extends State<Register> {
                   ElevatedButton(
                     child: !imageReceived? Text('Provide user Image'): Icon(Icons.thumb_up_alt_sharp),
                     onPressed: () async {
-                      bool gotImage = await CameraSupport(context: context).getImageClickedFromCamera();
-                      gotImage != null? setState(() {
+                      dynamic encoding = await CameraSupport(context: context).getImageClickedFromCamera();
+                      encoding != null? setState(() {
                         imageReceived = true;
+                        user.encode = encoding;
                       }): print('no image was found');
                     },
                   ),

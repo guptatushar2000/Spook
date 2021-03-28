@@ -14,7 +14,7 @@ class CameraSupport {
     try {
       PickedFile pickedFile = await ImagePicker().getImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
       File imageFile = File(pickedFile.path);
-      await FaceDetection(imageFile: imageFile, context: context).getFace();
+      List output = await FaceDetection(imageFile: imageFile, context: context).getFace();
       // showDialog(
       //   context: context,
       //   builder: (BuildContext context) {
@@ -26,10 +26,10 @@ class CameraSupport {
       //     );
       //   }
       // );
-      return true;
+      return output;
     } catch(e) {
       print('error is: ' + e.toString());
-      return false;
+      return null;
     }
   }
 
