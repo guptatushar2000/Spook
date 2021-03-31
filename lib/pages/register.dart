@@ -5,6 +5,11 @@ import 'package:spook/services/auth.dart';
 import 'package:spook/services/cameraSupport.dart';
 
 class Register extends StatefulWidget {
+
+  final Function togglePin;
+
+  Register({this.togglePin});
+
   @override
   _RegisterState createState() => _RegisterState();
 }
@@ -23,6 +28,13 @@ class _RegisterState extends State<Register> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Register to the app'),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_sharp,
+            color: Colors.white,
+          ),
+          onPressed: () => widget.togglePin(),
+        ),
       ),
       body: SingleChildScrollView(
         child: ConstrainedBox(

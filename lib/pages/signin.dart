@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:spook/models/user.dart';
-import 'package:spook/pages/register.dart';
 import 'package:spook/services/auth.dart';
 
 class SignIn extends StatefulWidget {
+
+  final Function togglePin;
+
+  SignIn({this.togglePin});
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -89,7 +93,7 @@ class _SignInState extends State<SignIn> {
                 SizedBox(height: 20.0,),
                 ElevatedButton(
                   child: Text('Register new user'),
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Register())),
+                  onPressed: () => widget.togglePin(),
                 ),
                 SizedBox(height: 20.0,),
                 Text(

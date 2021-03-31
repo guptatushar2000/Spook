@@ -4,8 +4,9 @@ import 'package:spook/models/user.dart';
 class DatabaseService {
 
   final String uid;
+  final String code;
 
-  DatabaseService({this.uid});
+  DatabaseService({this.uid, this.code});
 
   // collection reference.
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('user');
@@ -72,9 +73,38 @@ class DatabaseService {
     }
   }
 
+  // update isActive key in subject document for starting attendance.
+  Future startClass(String code, bool value) async {
+    try {
+      return await subjectCollection.doc(code).update({'isActive': value});
+    } catch(e) {
+
+    }
+  }
+
+  // fetch complete face encoding list from firestore.
+  Future getFaceEncodingFromFirestore() async {
+    try {
+      List encoding = [];
+      await userCollection.doc(uid).get().then((DocumentSnapshot snapshot) {
+        List.from(snapshot.data()['encode']).forEach((element) {
+          encoding.add(element);
+        });
+      });
+      return encoding;
+    } catch(e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
   // get user stream.
   Stream<DocumentSnapshot> get user {
     return userCollection.doc(uid).snapshots();
   }
 
+  // get subject stream.
+  Stream<DocumentSnapshot> get sub {
+    return subjectCollection.doc(code).snapshots();
+  }
 }

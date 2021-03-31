@@ -21,10 +21,10 @@ class FaceDetection {
       final FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(imageFile);
       final FaceDetector faceDetector = FirebaseVision.instance.faceDetector(FaceDetectorOptions(
         mode: FaceDetectorMode.fast,
-        enableLandmarks: true,
-        enableTracking: true,
-        enableClassification: true,
-        enableContours: true,
+        // enableLandmarks: true,
+        // enableTracking: true,
+        // enableClassification: true,
+        // enableContours: true,
       ));
       List<Face> faces = await faceDetector.processImage(visionImage);
       print('length: ' + faces.length.toString());

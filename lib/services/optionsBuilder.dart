@@ -1,4 +1,11 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spook/models/user.dart';
+import 'package:spook/services/cameraSupport.dart';
+import 'package:spook/services/database.dart';
 
 class ListBuild extends StatefulWidget {
 
@@ -12,6 +19,10 @@ class ListBuild extends StatefulWidget {
 }
 
 class _ListBuildState extends State<ListBuild> {
+
+  String name;
+  String code;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,24 +31,29 @@ class _ListBuildState extends State<ListBuild> {
         child: ListView.builder(
           itemCount: widget.list.length,
           itemBuilder: (context, index) {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0,),
-              child: Card(
-                elevation: 10.0,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.0,),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          Text('Name: ' + widget.list[index]['subject']),
-                          SizedBox(height: 5.0,),
-                          Text('Code: ' + widget.list[index]['key']),
-                        ],
-                      ),
-                      Attendance(index: widget.index,),
-                    ],
+            name = widget.list[index]['subject'];
+            code = widget.list[index]['key'];
+            return StreamProvider<DocumentSnapshot>.value(
+              value: DatabaseService(code: code).sub,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0,),
+                child: Card(
+                  elevation: 10.0,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5.0,),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Column(
+                          children: <Widget>[
+                            Text('Name: ' + name),
+                            SizedBox(height: 5.0,),
+                            Text('Code: ' + code),
+                          ],
+                        ),
+                        Attendance(index: widget.index),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -78,17 +94,21 @@ class TeacherAttendance extends StatefulWidget {
 
 class _TeacherAttendanceState extends State<TeacherAttendance> {
 
-  // fetch isActive value from the subject database.
   bool _isActive = false;
+  String code;
 
   @override
   Widget build(BuildContext context) {
+    final subject = Provider.of<DocumentSnapshot>(context);
+    code = subject != null? subject.data()['code']: '';
+    _isActive = subject != null? subject.data()['isActive']: false;
     return Switch.adaptive(
       value: _isActive,
-      onChanged: (val) {
+      onChanged: (val) async {
         setState(() {
           _isActive = !_isActive;
         });
+        await DatabaseService(code: code).startClass(code, _isActive);
       },
     );
   }
@@ -101,13 +121,40 @@ class StudentAttendance extends StatefulWidget {
 
 class _StudentAttendanceState extends State<StudentAttendance> {
 
-  void _markPresence() async {
+  double euclideanDistance(dynamic encoding, dynamic curFace) {
+    try {
+      double distance = 0.0;
+      for(int i=0; i<192; ++i) {
+        distance += (encoding[i]-curFace[i])*(encoding[i]-curFace[i]);
+      }
+      distance = sqrt(distance);
+      print('distance between face vectors is: ' + distance.toString());
+      return distance;
+    } catch(e) {
+      print(e.toString());
+      return 100.0;
+    }
+  }
+
+  void _markPresence(String uid) async {
+    dynamic output = await CameraSupport(context: context).getImageClickedFromCamera();
+    dynamic encoding = await DatabaseService(uid: uid).getFaceEncodingFromFirestore();
+    dynamic result;
+    if(output == null || encoding == null || encoding == []) {
+      result = false;
+    } else  {
+      if(euclideanDistance(encoding, output) <= 0.6) {
+        result = true;
+      } else {
+        result = false;
+      }
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text('You have been marked present!'),
+          content: result == true? Text('You have been marked present!'): Text('Unknown person detected.'),
         );
       }
     );
@@ -117,12 +164,11 @@ class _StudentAttendanceState extends State<StudentAttendance> {
 
   @override
   Widget build(BuildContext context) {
+    final subject = Provider.of<DocumentSnapshot>(context);
+    final user = Provider.of<AppUser>(context);
     return ElevatedButton(
       child: Text('Mark Presence'),
-      onPressed: _markPresence,
+      onPressed: (subject != null? subject.data()['isActive']: false) ? () => _markPresence(user.uid): null,
     );
   }
 }
-
-
-

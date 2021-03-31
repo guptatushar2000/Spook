@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spook/models/user.dart';
 import 'package:spook/pages/home.dart';
-import 'package:spook/pages/signin.dart';
+import 'package:spook/pages/navigation.dart';
 
 class StartUp extends StatefulWidget {
   @override
@@ -15,6 +15,6 @@ class _StartUpState extends State<StartUp> {
 
     final user = Provider.of<AppUser>(context);
 
-    return user!=null? Home(): SignIn();
+    return user!=null? Home(): Navigation();
   }
 }
