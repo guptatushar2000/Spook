@@ -45,9 +45,14 @@ class CameraSupport {
       cameraController.startImageStream(
           (image) async {
             try {
-
+              bool isVerified = false;
+              while(!isVerified) {
+                // provide logic for continuously verifying faces.
+                isVerified = true;
+              }
             } catch(e) {
-
+              print(e.toString());
+              return null;
             }
           }
       );

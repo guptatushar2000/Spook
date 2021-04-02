@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -97,18 +96,52 @@ class _TeacherAttendanceState extends State<TeacherAttendance> {
   bool _isActive = false;
   String code;
 
+  // ask the user if he wishes to continue;
+  Future<bool> prompt(bool value) async {
+    bool newValue = false;
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: SingleChildScrollView(
+          child: Center(child: Text('Do you wish to continue?'),),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Yes'),
+            onPressed: () {
+              Navigator.pop(context);
+              newValue = !value;
+            },
+          ),
+          TextButton(
+            child: Text('No'),
+            onPressed: () {
+              Navigator.pop(context);
+              newValue = value;
+            },
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+    return newValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final subject = Provider.of<DocumentSnapshot>(context);
+    final user = Provider.of<AppUser>(context);
     code = subject != null? subject.data()['code']: '';
     _isActive = subject != null? subject.data()['isActive']: false;
     return Switch.adaptive(
       value: _isActive,
       onChanged: (val) async {
+        bool value = await prompt(_isActive);
         setState(() {
-          _isActive = !_isActive;
+          _isActive = value;
         });
         await DatabaseService(code: code).startClass(code, _isActive);
+        _isActive? await DatabaseService(uid: user.uid, code: code).markPresence(): print('Class deactivated!');
       },
     );
   }
@@ -136,15 +169,17 @@ class _StudentAttendanceState extends State<StudentAttendance> {
     }
   }
 
-  void _markPresence(String uid) async {
+  Future _markPresence(String uid, String code) async {
     dynamic output = await CameraSupport(context: context).getImageClickedFromCamera();
     dynamic encoding = await DatabaseService(uid: uid).getFaceEncodingFromFirestore();
     dynamic result;
     if(output == null || encoding == null || encoding == []) {
       result = false;
     } else  {
-      if(euclideanDistance(encoding, output) <= 0.6) {
+      // boundary distance has been kept 1.0 unit for trial purposes.
+      if(euclideanDistance(encoding, output) <= 1.0) {
         result = true;
+        await DatabaseService(uid: uid, code: code).markPresence();
       } else {
         result = false;
       }
@@ -162,13 +197,40 @@ class _StudentAttendanceState extends State<StudentAttendance> {
     Navigator.pop(context);
   }
 
+  Future prompt(String uid, String code) async {
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: SingleChildScrollView(
+          child: Center(child: Text('Do you wish to continue?'),),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Yes'),
+            onPressed: () async {
+              Navigator.pop(context);
+              await _markPresence(uid, code);
+            },
+          ),
+          TextButton(
+            child: Text('No'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final subject = Provider.of<DocumentSnapshot>(context);
     final user = Provider.of<AppUser>(context);
     return ElevatedButton(
       child: Text('Mark Presence'),
-      onPressed: (subject != null? subject.data()['isActive']: false) ? () => _markPresence(user.uid): null,
+      onPressed: (subject != null ? subject.data()['isActive']: false) ? () async => await prompt(user.uid, subject.data()['code']): null,
     );
   }
 }

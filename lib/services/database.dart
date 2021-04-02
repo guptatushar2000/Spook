@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spook/models/user.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseService {
 
@@ -26,11 +27,16 @@ class DatabaseService {
 
   // update subject data.
   Future updateSubjectData(String code, String name, String teacher, bool isActive) async {
-    return await subjectCollection.doc(code).set({
+    await subjectCollection.doc(code).set({
       'isActive': isActive,
       'subject': name,
       'code': code,
       'teacher': teacher,
+    });
+    // creating a collection of documents within subject document to hold attendance data.
+    return await subjectCollection.doc(code).collection('attend').doc(teacher).set({
+      'total': 0,
+      'dates': <DateTime>[],
     });
   }
 
@@ -46,6 +52,11 @@ class DatabaseService {
 
       if(action == 'add') {
         await userCollection.doc(uid).update({type: FieldValue.arrayUnion([sub])});
+        // include the student in the attendance collection inside the subject document.
+        await subjectCollection.doc(code).collection('attend').doc(uid).set({
+          'total': 0,
+          'dates': <DateTime>[],
+        });
       }
       if(action == 'remove') {
         await userCollection.doc(uid).update({type: FieldValue.arrayRemove([sub])});
@@ -92,6 +103,22 @@ class DatabaseService {
         });
       });
       return encoding;
+    } catch(e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // mark presence in attendance collection.
+  Future markPresence() async {
+    try {
+      String currDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await subjectCollection.doc(code).collection('attend').doc(uid).update({'dates': FieldValue.arrayUnion([currDate])});
+      int length = await subjectCollection.doc(code).collection('attend').doc(uid).get().then((DocumentSnapshot snapshot) {
+        return snapshot.data()['dates'].length;
+      });
+      await subjectCollection.doc(code).collection('attend').doc(uid).update({'total': length});
+      return null;
     } catch(e) {
       print(e.toString());
       return null;
